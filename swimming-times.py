@@ -1,6 +1,5 @@
 import PyPDF2
 
-### Functions
 def getEvent (line):
     """Gets the event from a line of times"""
     reversedLine = line[::-1].split(" ")
