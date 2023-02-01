@@ -12,14 +12,17 @@ def getEvent (line):
     return event.lower()
 
 def mmssToSeconds (time):
-    timesList = time.split(":")
-    timesList.append(timesList[1].split(".")[1])
-    timesList[1] = timesList[1].split(".")[0]
-    timeInSeconds = (int(timesList[0]) * 60) + int(timesList[1]) + (int(timesList[2]) / 100)
+    if [*time].count(":") == 0:
+        timeInSeconds = int(time.split(".")[0]) + int(time.split(".")[1])/100
+    else:
+        timesList = time.split(":")
+        timesList.append(timesList[1].split(".")[1])
+        timesList[1] = timesList[1].split(".")[0]
+        timeInSeconds = (int(timesList[0]) * 60) + int(timesList[1]) + (int(timesList[2]) / 100)
     return timeInSeconds
 
 # Opening and Reading PDF
-timesPDF = open("swimmingTimes.pdf", "rb")
+timesPDF = open("swimming-times-standards.pdf", "rb")
 pdfReader = PyPDF2.PdfReader(timesPDF)
 
 # Converting each line of each page into lists
@@ -150,6 +153,9 @@ elif ageGroupStartPage == 6:
 # Format Girls B BB A AA AAA AAAA - Boys B BB A AA AAA AAAA
 eventTimesLineList = eventTimesLine.split(" ")
 timeRankingOrder = ["B", "BB", "A", "AA", "AAA", "AAAA"]
+# Get Rid of Asteriks in eventTimesLineList
+while eventTimesLineList.count("*") > 0:
+    eventTimesLineList.remove("*")
 # Taking off event name
 for i in range(0, 3):
     eventTimesLineList.pop(len(eventTimesLineList)-1)
@@ -164,7 +170,10 @@ elif gender == "girls" or gender == "g":
 print("Time Rankings:")
 timeCounter = 0
 for time in eventTimesLineList:
-    print(timeRankingOrder[timeCounter] + ": " + time)
+    try:
+        print(timeRankingOrder[timeCounter] + ": " + time)
+    except:
+        pass
     timeCounter += 1
 # Convert User's Time to Seconds
 userTimeInSeconds = mmssToSeconds(userTime)
@@ -177,9 +186,9 @@ for time in eventTimesLineList[::-1]:
     timeCounter += 1
 
 if timeCounter == 6:
-    print("Your time is slower than a B time. You have " + str(round((userTimeInSeconds - timeToBreak)*100)/100) + " seconds to shave of to get a B time.")
+    print("Your time is slower than a B time. You need to shave " + str(round((userTimeInSeconds - timeToBreak)*100)/100) + " seconds off to get a B time.")
 elif timeRankingOrder[::-1][timeCounter] != "AAAA":
-    print("You have a " + timeRankingOrder[::-1][timeCounter] + " time. You have " + str(round((userTimeInSeconds - timeToBreak)*100)/100) + " seconds to shave off to get a " + timeRankingOrder[::-1][timeCounter-1] + " time.")
+    print("You have a " + timeRankingOrder[::-1][timeCounter] + " time. You need to shave " + str(round((userTimeInSeconds - timeToBreak)*100)/100) + " seconds off to get a " + timeRankingOrder[::-1][timeCounter-1] + " time.")
 else:
     print("You have an AAAA time! Fantastic!")
 
